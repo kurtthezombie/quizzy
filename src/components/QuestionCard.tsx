@@ -29,7 +29,12 @@ export function QuestionCard({
   return (
     <Card>
       <CardContent className="space-y-6 pt-6">
-        <h2 className="text-xl font-semibold">{question.question}</h2>
+        <h2 className="text-xl font-semibold whitespace-pre-wrap">{question.question}</h2>
+        {question.code && (
+          <pre className="mt-4 overflow-x-auto rounded-md bg-muted p-4 text-sm">
+            <code>{question.code}</code>
+          </pre>
+        )}
 
         <ChoiceList
           choices={question.choices}

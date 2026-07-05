@@ -1,13 +1,14 @@
 export type Choice = {
-  id: string;
+  id: ChoiceId;
   text: string;
 };
 
 export type Question = {
-  id: string,
-  question: string,
-  choices: Choice[],
-  answerId: string;
+  id: string;
+  question: string
+  code?: string;
+  choices: Choice[];
+  answerId: ChoiceId;
   explanation?: string;
 };
 

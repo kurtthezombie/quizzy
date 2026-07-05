@@ -16,6 +16,63 @@ export function ImportPage({ onStartReviewer }: ImportPageProps) {
   const [jsonInput, setJsonInput] = useState("");
   const [error, setError] = useState("");
 
+  const [topic, setTopic] = useState();
+  const [questionCount, setQuestionCount] = useState("15");
+  const [difficulty, setDifficulty] = useState("Medium-Hard");
+  const [questionStyle, setQuestionStyle] = useState("Mixed");
+
+  const aiPrompt = `Create a reviewer JSON for the topic: ${topic}.
+
+Question count: ${questionCount}
+Difficulty: ${difficulty}
+Question style: ${questionStyle}
+
+Follow this exact JSON structure:
+{
+  "title": "Reviewer title here",
+  "questions": [
+    {
+      "id": "q1",
+      "question": "Question text here",
+      "code": "Optional code snippet here. Omit this field if there is no code.",
+      "choices": [
+        { "id": "a", "text": "Choice A" },
+        { "id": "b", "text": "Choice B" },
+        { "id": "c", "text": "Choice C" },
+        { "id": "d", "text": "Choice D" }
+      ],
+      "answerId": "a",
+      "explanation": "Explain why the answer is correct."
+    }
+  ]
+}
+
+Rules:
+- Return valid JSON only.
+- Do not use markdown.
+- Do not wrap the JSON in code fences.
+- Use unique question ids like q1, q2, q3.
+- Each question must have exactly 4 choices.
+- Choice ids must be exactly a, b, c, d.
+- answerId must match one of the choice ids.
+- Include an explanation for every question.
+- Generate exactly ${questionCount} questions.
+- Randomize the correct answer position across a, b, c, and d.
+- Do not make the correct answer always the same choice.
+- Distribute correct answers as evenly as possible.
+- Make the difficulty ${difficulty}.
+- Use a ${questionStyle} question style.
+- Make incorrect choices plausible and close enough to make users think carefully.
+- Avoid joke answers, obviously wrong answers, or filler choices.
+- For questions with code snippets, put the code in the optional "code" field, not inside the "question" field.
+- Omit the "code" field when the question has no code snippet.
+- Keep the "question" field as plain question text only.
+- Avoid double quotes inside code snippets when possible. Use single quotes for character output, such as std::cout << ' ';.
+- If double quotes are unavoidable inside any JSON string value, escape them properly as \\".
+- Return strictly parseable JSON.
+- Questions should require understanding, not just memorization.
+- Keep explanations clear and concise.`;
+
   function validateReviewer(value: unknown): Reviewer {
     const reviewer = value as Reviewer;
 
@@ -35,6 +92,10 @@ export function ImportPage({ onStartReviewer }: ImportPageProps) {
         !question.answerId
       ) {
         throw new Error("One or more questions are missing required fields.");
+      }
+
+      if (question.choices.length !== 4) {
+        throw new Error(`Question "${question.id}" must have exactly 4 choices.`);
       }
 
       const hasAnswer = question.choices.some(
@@ -70,6 +131,10 @@ export function ImportPage({ onStartReviewer }: ImportPageProps) {
     setError("");
   }
 
+  async function handleCopyPrompt() {
+    await navigator.clipboard.writeText(aiPrompt);
+  }
+
   return (
     <main className="min-h-screen bg-background p-6 text-foreground">
       <div className="mx-auto max-w-3xl space-y-6">
@@ -94,42 +159,77 @@ export function ImportPage({ onStartReviewer }: ImportPageProps) {
             />
 
             <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
-              <p className="mb-2 font-medium text-foreground">
-                AI prompt for generating reviewer JSON
-              </p>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <p className="font-medium text-foreground">
+                  AI prompt for generating reviewer JSON
+                </p>
+
+                <Button variant="outline" size="sm" onClick={handleCopyPrompt}>
+                  Copy Prompt
+                </Button>
+              </div>
+
+              <div className="mb-4 grid gap-3 sm:grid-cols-2">
+                <label className="space-y-1">
+                  <span className="text-xs font-medium text-foreground">
+                    Topic
+                  </span>
+                  <input
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground"
+                    value={topic}
+                    onChange={(event) => setTopic(event.target.value)}
+                    placeholder="C++ Junior Level"
+                  />
+                </label>
+
+                <label className="space-y-1">
+                  <span className="text-xs font-medium text-foreground">
+                    Number of questions
+                  </span>
+                  <input
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground"
+                    type="number"
+                    min="1"
+                    value={questionCount}
+                    onChange={(event) => setQuestionCount(event.target.value)}
+                  />
+                </label>
+
+                <label className="space-y-1">
+                  <span className="text-xs font-medium text-foreground">
+                    Difficulty
+                  </span>
+                  <select
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground"
+                    value={difficulty}
+                    onChange={(event) => setDifficulty(event.target.value)}
+                  >
+                    <option>Easy</option>
+                    <option>Medium</option>
+                    <option>Medium-Hard</option>
+                    <option>Hard</option>
+                  </select>
+                </label>
+
+                <label className="space-y-1">
+                  <span className="text-xs font-medium text-foreground">
+                    Question style
+                  </span>
+                  <select
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm text-foreground"
+                    value={questionStyle}
+                    onChange={(event) => setQuestionStyle(event.target.value)}
+                  >
+                    <option>Mixed</option>
+                    <option>Conceptual</option>
+                    <option>Code-based</option>
+                    <option>Scenario-based</option>
+                  </select>
+                </label>
+              </div>
 
               <pre className="whitespace-pre-wrap rounded-md bg-background p-3 text-xs">
-              {`Create a reviewer JSON for the topic: [TOPIC].
-
-              Follow this exact JSON structure:
-              {
-              "title": "Reviewer title here",
-              "questions": [
-                {
-                  "id": "q1",
-                  "question": "Question text here",
-                  "choices": [
-                    { "id": "a", "text": "Choice A" },
-                    { "id": "b", "text": "Choice B" },
-                    { "id": "c", "text": "Choice C" },
-                    { "id": "d", "text": "Choice D" }
-                  ],
-                  "answerId": "a",
-                  "explanation": "Explain why the answer is correct."
-                }
-              ]
-              }
-
-              Rules:
-              - Return valid JSON only.
-              - Do not use markdown.
-              - Do not wrap the JSON in code fences.
-              - Use unique question ids like q1, q2, q3.
-              - Each question must have exactly 4 choices.
-              - choice ids must be a, b, c, d.
-              - answerId must match one of the choice ids.
-              - Include an explanation for every question.
-              - Generate [NUMBER] questions.`}
+                {aiPrompt}
               </pre>
             </div>
 
