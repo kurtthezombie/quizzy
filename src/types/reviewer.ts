@@ -1,3 +1,5 @@
+export type ChoiceId = "a" | "b" | "c" | "d";
+
 export type Choice = {
   id: ChoiceId;
   text: string;

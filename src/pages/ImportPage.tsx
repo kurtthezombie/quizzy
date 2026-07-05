@@ -16,7 +16,7 @@ export function ImportPage({ onStartReviewer }: ImportPageProps) {
   const [jsonInput, setJsonInput] = useState("");
   const [error, setError] = useState("");
 
-  const [topic, setTopic] = useState();
+  const [topic, setTopic] = useState("");
   const [questionCount, setQuestionCount] = useState("15");
   const [difficulty, setDifficulty] = useState("Medium-Hard");
   const [questionStyle, setQuestionStyle] = useState("Mixed");
