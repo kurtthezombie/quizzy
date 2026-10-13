@@ -1,3 +1,4 @@
+import { Brand } from "@/components/Brand";
 import { useState } from "react";
 
 import { QuestionCard } from "@/components/QuestionCard";
@@ -21,7 +22,7 @@ export function ReviewerPage({ reviewer, onBackToImport }: ReviewerPageProps) {
   const isLastQuestion = currentIndex === reviewer.questions.length - 1;
 
   function submitAnswer() {
-    if (!currentQuestion || !selectedAnswer) return;
+    if (!currentQuestion || !selectedAnswer || isAnswered) return;
 
     if (selectedAnswer === currentQuestion.answerId) {
       setScore((prev) => prev + 1);
@@ -44,13 +45,13 @@ export function ReviewerPage({ reviewer, onBackToImport }: ReviewerPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-background p-6 text-foreground">
-      <div className="mx-auto max-w-3xl space-y-6">
+    <main className="app-shell reviewer-shell">
+      <Brand /><div className="reviewer-content mx-auto max-w-3xl space-y-6">
         <section className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Mini Reviewer</h1>
+            <h1 className="text-3xl font-bold">Your quiz</h1>
             <p className="text-muted-foreground">
-              Answer questions and get instant feedback.
+              Choose an answer to see how you did.
             </p>
           </div>
 
@@ -77,7 +78,7 @@ export function ReviewerPage({ reviewer, onBackToImport }: ReviewerPageProps) {
               score={score}
             />
 
-            <QuestionCard
+            <QuestionCard key={currentIndex}
               question={currentQuestion}
               selectedAnswer={selectedAnswer}
               isAnswered={isAnswered}

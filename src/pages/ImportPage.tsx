@@ -1,3 +1,4 @@
+import { Brand } from "@/components/Brand";
 import { useState } from "react";
 
 import type { Reviewer } from "@/types/reviewer";
@@ -15,6 +16,7 @@ type ImportPageProps = {
 export function ImportPage({ onStartReviewer }: ImportPageProps) {
   const [jsonInput, setJsonInput] = useState("");
   const [error, setError] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
 
   const [topic, setTopic] = useState("");
   const [questionCount, setQuestionCount] = useState("15");
@@ -132,39 +134,33 @@ Rules:
   }
 
   async function handleCopyPrompt() {
-    await navigator.clipboard.writeText(aiPrompt);
+    try { await navigator.clipboard.writeText(aiPrompt); setCopyStatus("Copied! Paste it into your AI chat."); } catch { setCopyStatus("Copy failed. Open the prompt below to copy it manually."); }
   }
 
   return (
-    <main className="min-h-screen bg-background p-6 text-foreground">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <section>
-          <h1 className="text-3xl font-bold">Mini Reviewer</h1>
-          <p className="text-muted-foreground">
-            Paste a reviewer JSON, then start answering.
-          </p>
+    <main className="app-shell">
+      <Brand /><div>
+<section className="intro">
+          <div className="intro-text">
+            <h1>What will you have after 500 questions?</h1>
+            <p className="intro-copy">Everyone and everything you know, will pay off in time.</p>
+          </div>
+          <figure className="mascot-panel">
+            <div className="mascot-images">
+              <img className="mascot-geometry" src="/geometric-orbit.gif" alt="" aria-hidden="true" />
+              <img className="mascot-idle" src="/mascot-hero.webp" alt="Quizzy's red-gloved mascot pointing to his temple" width="440" height="440" fetchPriority="high" />
+              <img className="mascot-angry" src="/mascot-angry.webp" width="440" height="440" alt="" aria-hidden="true" />
+            </div>
+            <figcaption className="mascot-caption">THINK, MARK!</figcaption>
+          </figure>
         </section>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Import Reviewer</CardTitle>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <Textarea
-              className="min-h-[420px] font-mono text-sm"
-              placeholder="Paste reviewer JSON here..."
-              value={jsonInput}
-              onChange={(event) => setJsonInput(event.target.value)}
-            />
-
-            <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
+        <div className="workspace">            <div className="prompt-panel">
               <div className="mb-4 flex items-center justify-between gap-3">
-                <p className="font-medium text-foreground">
-                  AI prompt for generating reviewer JSON
-                </p>
+                <h2 className="font-medium text-foreground">
+                  Set up your quiz
+                </h2>
 
-                <Button variant="outline" size="sm" onClick={handleCopyPrompt}>
+                <Button variant="outline" size="sm" onClick={handleCopyPrompt} disabled={!topic.trim() || !Number.isInteger(Number(questionCount)) || Number(questionCount) < 1}>
                   Copy Prompt
                 </Button>
               </div>
@@ -228,14 +224,27 @@ Rules:
                 </label>
               </div>
 
-              <pre className="whitespace-pre-wrap rounded-md bg-background p-3 text-xs">
+              <p className="field-help">Copy this prompt into your favorite AI chat, then paste its JSON response on the right.</p><p role="status">{copyStatus}</p><details className="prompt-preview"><summary>View prompt</summary><pre className="whitespace-pre-wrap rounded-md bg-background p-3 text-xs">
                 {aiPrompt}
-              </pre>
+              </pre></details>
             </div>
+
+        <Card className="import-panel">
+          <CardHeader>
+            <CardTitle id="import-heading">Load your questions</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <Textarea
+              aria-labelledby="import-heading" spellCheck={false} className="json-editor font-mono text-sm"
+              placeholder={'{\n  "title": "Your next challenge",\n  "questions": [ ... ]\n}'}
+              value={jsonInput}
+              onChange={(event) => setJsonInput(event.target.value)}
+            />
 
             <div className="flex flex-wrap gap-2">
               <Button onClick={handleLoadReviewer} disabled={!jsonInput.trim()}>
-                Start Reviewer
+                Start quiz
               </Button>
 
               <Button variant="outline" onClick={handleUseSample}>
@@ -250,7 +259,7 @@ Rules:
               </Alert>
             )}
           </CardContent>
-        </Card>
+        </Card></div><section className="sample-strip"><div><h2>Try it first</h2><p>Open a sample quiz without setting anything up.</p></div><Button variant="ghost" onClick={() => onStartReviewer(sampleReviewer)}>Try a sample &rarr;</Button></section>
       </div>
     </main>
   );

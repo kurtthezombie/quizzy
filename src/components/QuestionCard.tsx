@@ -27,7 +27,7 @@ export function QuestionCard({
   const isCorrect = selectedAnswer === question.answerId;
 
   return (
-    <Card>
+    <Card className="question-card">
       <CardContent className="space-y-6 pt-6">
         <h2 className="text-xl font-semibold whitespace-pre-wrap">{question.question}</h2>
         {question.code && (
@@ -46,7 +46,7 @@ export function QuestionCard({
 
         {isAnswered && (
           <Alert variant={isCorrect ? "default" : "destructive"}>
-            <AlertTitle>{isCorrect ? "Correct" : "Wrong"}</AlertTitle>
+            <AlertTitle>{isCorrect ? "Nicely done." : "Not quite. Here is the idea."}</AlertTitle>
             <AlertDescription>
               {question.explanation ?? "No explanation provided."}
             </AlertDescription>

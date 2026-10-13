@@ -16,13 +16,14 @@ export function ResultCard({
   const isPerfectScore = score === totalQuestions;
 
   return (
-    <Card>
+    <Card className="result-card">
       <CardHeader>
-        <CardTitle>Quiz Complete</CardTitle>
+        <img className="result-mascot" src="/mascot-result.webp" alt="" width="120" height="120" />
+        <CardTitle>Quiz complete.</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <p className="text-5xl font-bold">
+        <p className="result-score">
           {score} / {totalQuestions}
         </p>
 
@@ -32,7 +33,7 @@ export function ResultCard({
           <p className="text-2xl font-bold">🎉 You nailed it.</p>
         )}
 
-        <Button onClick={onResetQuiz}>Retry Quiz</Button>
+        <Button onClick={onResetQuiz}>Try again</Button>
       </CardContent>
     </Card>
   );

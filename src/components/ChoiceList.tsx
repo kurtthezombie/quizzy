@@ -32,7 +32,8 @@ export function ChoiceList({
           <Label
             key={choice.id}
             className={[
-              "flex cursor-pointer items-center gap-3 rounded-lg border p-4",
+              "choice-row flex cursor-pointer items-center gap-3 rounded-lg border p-4",
+              isSelected && !isAnswered ? "choice-selected" : "",
               isAnswered && isAnswer ? "border-green-500 bg-green-500/10" : "",
               isAnswered && isSelected && !isAnswer
                 ? "border-red-500 bg-red-500/10"
@@ -40,7 +41,7 @@ export function ChoiceList({
             ].join(" ")}
           >
             <RadioGroupItem value={choice.id} />
-            <span>{choice.text}</span>
+            <span className="choice-letter" aria-hidden="true">{choice.id.toUpperCase()}</span><span>{choice.text}</span>{isAnswered && isAnswer && <span className="sr-only">Correct answer</span>}
           </Label>
         );
       })}
